@@ -3,116 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disk Drogas</title>
+    <title>WhatsApp Pro - Chat Global</title>
     <style>
-        :root { --wa-teal: #128c7e; --wa-light-green: #25d366; --wa-blue: #34b7f1; --wa-bg: #e5ddd5; --wa-red: #e53935; }
+        :root { --wa-teal: #075e54; --wa-light-green: #25d366; --wa-bg: #e5ddd5; --wa-me: #dcf8c6; --wa-other: #ffffff; }
         body { margin:0; font-family: 'Segoe UI', sans-serif; background:#111; display:flex; justify-content:center; height: 100vh; overflow: hidden; }
         .container { width:100%; max-width:450px; height:100%; background:#fff; display:flex; flex-direction:column; position: relative; }
         
-        /* Auth */
         #auth { margin:auto; width:85%; text-align: center; display: flex; flex-direction: column; gap: 10px; }
         #auth input { width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; outline: none; }
         #auth button { width:100%; padding:12px; background: var(--wa-light-green); color:#fff; border:none; border-radius:8px; font-weight: bold; cursor: pointer; }
 
-        /* App Structure */
-        #app { display:none; flex-direction:column; height:100%; }
-        .header { background: var(--wa-teal); color: white; padding: 15px; }
-        .tabs { display: flex; text-align: center; margin-top: 10px; }
-        .tab { flex: 1; padding: 10px; cursor: pointer; opacity: 0.7; border-bottom: 3px solid transparent; font-weight: bold; }
-        .tab.active { opacity: 1; border-bottom: 3px solid white; }
-
-        /* Lists */
-        .content-list { flex: 1; overflow-y: auto; display: none; background: #fff; }
-        .content-list.active { display: block; }
-        .item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; }
-        .avatar { width: 45px; height: 45px; background: #00a884; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px; flex-shrink: 0; }
-
-        /* Badge Verde */
-        .chat-info { flex: 1; display: flex; justify-content: space-between; align-items: center; min-width: 0; }
-        .chat-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 10px; }
-        .unread-badge { background: #25d366; color: white; font-size: 11px; font-weight: bold; min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 2px; }
-
-        /* Chat View */
-        #chatView { display:none; flex-direction:column; height:100%; position: absolute; top:0; left:0; width:100%; z-index: 20; background: var(--wa-bg); }
-        .chat-header { background: var(--wa-teal); color: white; padding: 10px; display: flex; align-items: center; gap: 10px; height: 60px; }
-        .chat-box { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        #app { display:none; flex-direction:column; height:100%; background: var(--wa-bg); }
+        .header { background: var(--wa-teal); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
         
-        .msg { padding: 8px 12px; border-radius: 8px; max-width: 75%; font-size: 15px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; }
-        .me { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
-        .other { background: #fff; align-self: flex-start; border-top-left-radius: 0; }
-        .msg-meta { font-size: 10px; color: #888; text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+        #chatBox { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        .msg { padding: 8px 12px; border-radius: 8px; max-width: 80%; font-size: 14px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; }
+        .me { background: var(--wa-me); align-self: flex-end; border-top-right-radius: 0; }
+        .other { background: var(--wa-other); align-self: flex-start; border-top-left-radius: 0; }
+        
+        .msg-user { font-weight: bold; font-size: 11px; margin-bottom: 3px; display: block; color: #075e54; }
+        .msg-meta { font-size: 10px; color: #888; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 5px; margin-top: 4px; }
+        .delete-btn { color: #e53935; cursor: pointer; font-size: 10px; margin-right: 8px; text-decoration: underline; }
 
-        .input-area { background: #f0f0f0; padding: 10px; display: flex; gap: 8px; align-items: center; }
-        .input-area input { flex: 1; border-radius: 25px; border: none; padding: 12px 18px; outline: none; font-size: 16px; }
-        .btn-send { background: var(--wa-teal); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+        .input-area { background: #f0f0f0; padding: 10px; display: flex; gap: 5px; align-items: center; }
+        .input-area input { flex: 1; border-radius: 25px; border: none; padding: 12px 15px; outline: none; font-size: 16px; }
+        .btn-action { background: none; border: none; font-size: 22px; cursor: pointer; padding: 5px; }
+        .btn-send { background: var(--wa-teal); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
 
-        /* Call Overlay */
-        #callOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7, 94, 84, 0.98); z-index:100; color:white; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
-        .call-btn { width:65px; height:65px; border-radius:50%; border:none; color:white; font-size:24px; cursor:pointer; margin:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .hangup { background: var(--wa-red); }
-        .answer { background: var(--wa-light-green); }
+        #regModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; }
+        .modal-content { background:#fff; padding:20px; border-radius:10px; width:80%; max-width:300px; display:flex; flex-direction:column; gap:10px; }
+
+        /* Chamada */
+        #callBar { display:none; background: #25d366; color: white; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"></audio>
-<audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
-
-<div id="callOverlay">
-    <div class="avatar" id="callAvatar" style="width:120px; height:120px; font-size:50px; margin-bottom:20px;">?</div>
-    <h2 id="callUserName">Usuário</h2>
-    <p id="callStatus">Iniciando...</p>
-    <div style="display:flex;">
-        <button id="btnAnswer" class="call-btn answer" style="display:none;">📞</button>
-        <button id="btnHangup" class="call-btn hangup">🚫</button>
-    </div>
-</div>
 
 <div class="container">
     <div id="auth">
-        <h2>WhatsApp Pro</h2>
+        <h2 style="color: #075e54;">Delivery De Drogas<br><small style="font-size: 12px; color: #666;">GRUPO CDL</small></h2>
         <input id="email" type="email" placeholder="E-mail">
         <input id="password" type="password" placeholder="Senha">
         <button onclick="authUser()">ENTRAR</button>
+        <p style="font-size: 13px; color: #666; cursor: pointer;" onclick="toggleReg(true)">Cadastrar novo usuário</p>
     </div>
 
     <div id="app">
         <div class="header">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <b>WhatsApp Pro</b>
-                <span onclick="logout()" style="cursor:pointer; font-size:12px;">SAIR</span>
-            </div>
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('chats', this)">CONVERSAS</div>
-                <div class="tab" onclick="switchTab('contacts', this)">CONTATOS</div>
+            <div><b>Chat Global</b></div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <span onclick="startGlobalCall()" style="cursor:pointer; font-size:20px;">📞</span>
+                <button onclick="logout()" style="background:none; border:1px solid #fff; color:white; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:11px;">SAIR</button>
             </div>
         </div>
-        <div id="list-chats" class="content-list active"></div>
-        <div id="list-contacts" class="content-list"></div>
-    </div>
 
-    <div id="chatView">
-        <div class="chat-header">
-            <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">←</button>
-            <div class="avatar" id="chatAvatar" style="width:38px; height:38px; font-size:15px; margin-right:5px;"></div>
-            <div style="flex:1;">
-                <b id="currentChatName"></b><br>
-                <small id="userPresence" style="font-size:11px; opacity:0.9;">Online</small>
-            </div>
-            <button onclick="startCall()" style="background:none; border:none; color:white; font-size:22px; cursor:pointer; padding:10px;">📞</button>
-        </div>
-        <div class="chat-box" id="chatBox"></div>
+        <div id="callBar" onclick="joinCall()">📞 Chamada em andamento... Clique para entrar</div>
+        <div id="chatBox"></div>
+
         <div class="input-area">
-            <input id="msgInput" type="text" placeholder="Digite uma mensagem..." autocomplete="off">
+            <button class="btn-action" onclick="openEmoji()">😊</button>
+            <input id="msgInput" type="text" placeholder="Mensagem..." autocomplete="off">
             <button class="btn-send" id="btnSend">➤</button>
         </div>
+    </div>
+</div>
+
+<div id="regModal">
+    <div class="modal-content">
+        <h3>Novo Cadastro</h3>
+        <input id="reg-email" type="email" placeholder="E-mail">
+        <input id="reg-password" type="password" placeholder="Senha">
+        <button onclick="registerUser()" style="padding:10px; background:var(--wa-teal); color:#fff; border:none; border-radius:5px; font-weight:bold;">CADASTRAR</button>
+        <button onclick="toggleReg(false)" style="background:none; border:none; color:#666;">Cancelar</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, updateDoc, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyA6gWb20jFrAYitLtujncJDOG8wwRCY0RU", 
@@ -125,241 +97,121 @@
     const db = getFirestore(app);
 
     let currentUser = null;
-    let activeChatId = null;
-    let currentOtherEmail = null;
-    let unsubMessages = null;
-    let lastUnreadCount = 0;
+    let lastMsgId = null;
 
-    // WebRTC Variables
-    let pc; 
-    let localStream;
-    const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
-
-    // --- AUTH LOGIC ---
+    // --- AUTH ---
     window.authUser = async () => {
         const e = document.getElementById("email").value, p = document.getElementById("password").value;
-        if(!e || !p) return alert("Preencha tudo");
-        try { await signInWithEmailAndPassword(auth, e, p); } 
-        catch { 
-            try {
-                const u = await createUserWithEmailAndPassword(auth, e, p); 
-                await setDoc(doc(db, "users", u.user.uid), { email: e, online: true, lastSeen: Date.now() }); 
-            } catch(err) { alert("Erro na senha ou login"); }
-        }
+        try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Erro no login"); }
     };
 
-    window.logout = () => { 
-        updateDoc(doc(db, "users", currentUser.uid), {online: false}); 
-        signOut(auth); 
+    window.registerUser = async () => {
+        const e = document.getElementById("reg-email").value, p = document.getElementById("reg-password").value;
+        try {
+            await createUserWithEmailAndPassword(auth, e, p); 
+            alert("Sucesso!"); toggleReg(false);
+        } catch (err) { alert("Erro: " + err.message); }
     };
+
+    window.logout = () => signOut(auth);
+    window.toggleReg = (s) => { document.getElementById("regModal").style.display = s ? "flex" : "none"; };
 
     onAuthStateChanged(auth, user => {
         if(user) { 
             currentUser = user; 
             document.getElementById("auth").style.display = "none"; 
             document.getElementById("app").style.display = "flex"; 
-            updateDoc(doc(db, "users", currentUser.uid), {online: true, lastSeen: Date.now()});
-            loadContacts(); 
-            loadChatHistory(); 
-            listenForCalls();
+            listenGlobalChat();
+            listenForGlobalCalls();
         } else { 
             document.getElementById("auth").style.display = "flex"; 
             document.getElementById("app").style.display = "none"; 
         }
     });
 
-    // --- CONTACTS & HISTORY ---
-    function loadContacts() {
-        onSnapshot(collection(db, "users"), snap => {
-            const list = document.getElementById("list-contacts"); list.innerHTML = "";
-            snap.forEach(d => {
-                const data = d.data(); if(data.email === currentUser.email) return;
-                const item = document.createElement("div"); item.className = "item";
-                item.innerHTML = `<div class="avatar">${data.email[0].toUpperCase()}</div><div><b>${data.email.split('@')[0]}</b></div>`;
-                item.onclick = () => openChat(data.email);
-                list.appendChild(item);
-            });
-        });
-    }
-
-    function loadChatHistory() {
-        onSnapshot(collection(db, "messages"), snap => {
-            const list = document.getElementById("list-chats"); list.innerHTML = "";
-            let chats = {}; let totalUnread = 0;
-            
-            snap.forEach(d => {
-                const data = d.data();
-                if(data.chat?.includes(currentUser.email)) {
-                    const other = data.chat.split("_").find(p => p !== currentUser.email);
-                    if(!chats[other]) chats[other] = { last: "", time: 0, unread: 0 };
-                    if(data.time > chats[other].time) { chats[other].last = data.text; chats[other].time = data.time; }
-                    if(data.user !== currentUser.email && data.status !== "read") { chats[other].unread++; totalUnread++; }
-                }
-            });
-
-            if (totalUnread > lastUnreadCount) document.getElementById("notifSound").play().catch(()=>{});
-            lastUnreadCount = totalUnread;
-
-            Object.keys(chats).sort((a,b) => chats[b].time - chats[a].time).forEach(email => {
-                const item = document.createElement("div"); item.className = "item";
-                const badge = chats[email].unread > 0 ? `<div class="unread-badge">${chats[email].unread}</div>` : "";
-                item.innerHTML = `
-                    <div class="avatar">${email[0].toUpperCase()}</div>
-                    <div class="chat-info">
-                        <div class="chat-text"><b>${email.split('@')[0]}</b><br><small>${chats[email].last}</small></div>
-                        ${badge}
-                    </div>`;
-                item.onclick = () => openChat(email);
-                list.appendChild(item);
-            });
-        });
-    }
-
-    // --- CHAT LOGIC ---
-    window.openChat = (other) => {
-        currentOtherEmail = other;
-        activeChatId = [currentUser.email, other].sort().join("_");
-        document.getElementById("chatView").style.display = "flex";
-        document.getElementById("currentChatName").innerText = other.split('@')[0];
-        document.getElementById("chatAvatar").innerText = other[0].toUpperCase();
-        listenMessages();
+    // --- EMOJIS ---
+    window.openEmoji = () => {
+        // Usa o seletor nativo do teclado/sistema (mais rápido e leve)
+        document.getElementById("msgInput").focus();
+        if ('showPicker' in HTMLInputElement.prototype) {
+             // Algumas builds modernas suportam nativamente
+        }
+        alert("Dica: Use o atalho (Win + Ponto) no PC ou o teclado do celular para emojis!");
     };
 
-    function listenMessages() {
-        if(unsubMessages) unsubMessages();
-        const q = query(collection(db, "messages"), where("chat", "==", activeChatId), orderBy("time", "asc"));
-        unsubMessages = onSnapshot(q, snap => {
-            const box = document.getElementById("chatBox"); box.innerHTML = ""; 
-            snap.forEach(d => {
-                const data = d.data();
-                if(data.user !== currentUser.email && data.status !== "read") updateDoc(doc(db, "messages", d.id), { status: "read" });
-                const msgDiv = document.createElement("div");
-                msgDiv.className = `msg ${data.user === currentUser.email ? 'me' : 'other'}`;
-                const timeStr = new Date(data.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                msgDiv.innerHTML = `${data.text} <div class="msg-meta">${timeStr}</div>`;
-                box.appendChild(msgDiv);
-            });
-            box.scrollTop = box.scrollHeight;
-        });
-    }
-
-    const sendMessage = async () => {
-        const input = document.getElementById("msgInput");
-        const txt = input.value.trim();
-        if(!txt || !activeChatId) return;
-        input.value = "";
-        await addDoc(collection(db, "messages"), { 
-            chat: activeChatId, 
-            user: currentUser.email, 
-            text: txt, 
-            time: Date.now(), 
-            status: "sent" 
-        });
-    };
-
-    // --- VOICE CALL LOGIC ---
-    window.startCall = async () => {
-        const callDoc = doc(collection(db, "calls"));
-        const offerDescription = await setupWebRTC();
-        
-        await setDoc(callDoc, { 
-            from: currentUser.email, 
-            to: currentOtherEmail, 
-            offer: { type: offerDescription.type, sdp: offerDescription.sdp },
-            status: 'ringing' 
-        });
-
-        showCallOverlay(currentOtherEmail, "Chamando...");
-        
-        onSnapshot(callDoc, (snapshot) => {
-            const data = snapshot.data();
-            if (data?.answer && !pc.currentRemoteDescription) {
-                pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-                document.getElementById("callStatus").innerText = "Em Chamada";
-                document.getElementById("ringtone").pause();
-            }
-            if (data?.status === 'ended') endCallLocal();
-        });
-
-        document.getElementById("btnHangup").onclick = async () => {
-            await updateDoc(callDoc, { status: 'ended' });
-            endCallLocal();
-        };
-    };
-
-    function listenForCalls() {
-        const q = query(collection(db, "calls"), where("to", "==", currentUser.email), where("status", "==", "ringing"));
-        onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
+    // --- CHAT ---
+    function listenGlobalChat() {
+        const q = query(collection(db, "global_messages"), orderBy("time", "asc"));
+        onSnapshot(q, snap => {
+            const box = document.getElementById("chatBox");
+            snap.docChanges().forEach(change => {
                 if (change.type === "added") {
                     const data = change.doc.data();
-                    const callId = change.doc.id;
-                    showCallOverlay(data.from, "Recebendo chamada...", true);
-                    document.getElementById("ringtone").play();
-
-                    document.getElementById("btnAnswer").onclick = async () => {
-                        document.getElementById("ringtone").pause();
-                        await setupWebRTC();
-                        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-                        const answerDescription = await pc.createAnswer();
-                        await pc.setLocalDescription(answerDescription);
-                        await updateDoc(doc(db, "calls", callId), { 
-                            answer: { type: answerDescription.type, sdp: answerDescription.sdp },
-                            status: 'active'
-                        });
-                        document.getElementById("btnAnswer").style.display = "none";
-                        document.getElementById("callStatus").innerText = "Em Chamada";
-                    };
-
-                    document.getElementById("btnHangup").onclick = () => {
-                        updateDoc(doc(db, "calls", callId), { status: 'ended' });
-                        endCallLocal();
-                    };
+                    if(data.user !== currentUser.email && lastMsgId !== null) document.getElementById("notifSound").play().catch(()=>{});
+                    
+                    const msgDiv = document.createElement("div");
+                    const isMe = data.user === currentUser.email;
+                    msgDiv.className = `msg ${isMe ? 'me' : 'other'}`;
+                    msgDiv.id = `msg-${change.doc.id}`;
+                    
+                    msgDiv.innerHTML = `
+                        <span class="msg-user">${isMe ? 'Você' : data.user.split('@')[0]}</span>
+                        <span>${data.text}</span>
+                        <div class="msg-meta">
+                            ${isMe ? `<span class="delete-btn" onclick="deleteMsg('${change.doc.id}')">Apagar</span>` : ''}
+                            ${new Date(data.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                        </div>`;
+                    box.appendChild(msgDiv);
+                    box.scrollTop = box.scrollHeight;
+                    lastMsgId = change.doc.id;
                 }
+                if (change.type === "removed") document.getElementById(`msg-${change.doc.id}`)?.remove();
             });
         });
     }
 
-    async function setupWebRTC() {
-        pc = new RTCPeerConnection(servers);
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    window.deleteMsg = async (id) => { if(confirm("Apagar?")) await deleteDoc(doc(db, "global_messages", id)); };
 
-        const remoteStream = new MediaStream();
-        pc.ontrack = (event) => {
-            event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
-            const audio = new Audio();
-            audio.srcObject = remoteStream;
-            audio.play();
-        };
-        return await pc.createOffer();
-    }
-
-    function showCallOverlay(name, status, isIncoming = false) {
-        document.getElementById("callOverlay").style.display = "flex";
-        document.getElementById("callUserName").innerText = name.split('@')[0];
-        document.getElementById("callAvatar").innerText = name[0].toUpperCase();
-        document.getElementById("callStatus").innerText = status;
-        document.getElementById("btnAnswer").style.display = isIncoming ? "block" : "none";
-        if(!isIncoming) document.getElementById("ringtone").play();
-    }
-
-    function endCallLocal() {
-        if(localStream) localStream.getTracks().forEach(t => t.stop());
-        if(pc) pc.close();
-        document.getElementById("callOverlay").style.display = "none";
-        document.getElementById("ringtone").pause();
-        document.getElementById("ringtone").currentTime = 0;
-    }
-
-    // --- UI HELPERS ---
-    document.getElementById("btnSend").onclick = sendMessage;
-    document.getElementById("msgInput").onkeydown = (e) => { if(e.key === "Enter") sendMessage(); };
-    window.closeChat = () => document.getElementById("chatView").style.display = "none";
-    window.switchTab = (tab, el) => {
-        document.querySelectorAll('.tab, .content-list').forEach(x => x.classList.remove('active'));
-        el.classList.add('active'); document.getElementById('list-'+tab).classList.add('active');
+    const sendMsg = async () => {
+        const input = document.getElementById("msgInput");
+        const txt = input.value.trim();
+        if(!txt) return;
+        input.value = "";
+        await addDoc(collection(db, "global_messages"), { user: currentUser.email, text: txt, time: Date.now() });
     };
+
+    // --- LIGAÇÃO GLOBAL ---
+    window.startGlobalCall = async () => {
+        if(confirm("Iniciar uma chamada de voz para o grupo?")) {
+            await setDoc(doc(db, "global_call", "current"), {
+                active: true,
+                startedBy: currentUser.email,
+                time: Date.now()
+            });
+        }
+    };
+
+    window.joinCall = () => {
+        alert("Entrando na conferência de voz...");
+        // Aqui integraria com WebRTC para múltiplos usuários
+    };
+
+    function listenForGlobalCalls() {
+        onSnapshot(doc(db, "global_call", "current"), (s) => {
+            const data = s.data();
+            const bar = document.getElementById("callBar");
+            if(data && data.active) {
+                bar.style.display = "block";
+                bar.innerText = `📞 Chamada de ${data.startedBy.split('@')[0]} ativa! Clique para entrar`;
+            } else {
+                bar.style.display = "none";
+            }
+        });
+    }
+
+    document.getElementById("btnSend").onclick = sendMsg;
+    document.getElementById("msgInput").onkeydown = (e) => { if(e.key === "Enter") sendMsg(); };
+
 </script>
 </body>
 </html>
