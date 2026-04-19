@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WhatsApp Pro - Elite Dark</title>
+    <style>
+        :root { 
+            --wa-teal: #00a884; 
+            --wa-light-green: #06cf9c; 
+            --dark-main: #111b21;
+            --dark-sec: #202c33;
+            --dark-hover: #2a3942;
+            --text-primary: #e9edef;
+            --text-sec: #8696a0;
+            --canada-red: #ff3b3b;
+        }
+
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
+
+        body { 
+            margin:0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #0c1317; display:flex; justify-content:center; 
+            height: 100vh; color: var(--text-primary); overflow: hidden;
+        }
+
+        .container { width:100%; max-width:450px; height:100%; background: var(--dark-main); display:flex; flex-direction:column; position: relative; }
+        
+        #auth { margin:auto; width:85%; text-align: center; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .maple-logo { font-size: 90px; color: var(--canada-red); filter: drop-shadow(0 0 15px rgba(255, 59, 59, 0.4)); }
+        #auth input { width:100%; padding: 15px; background: var(--dark-sec); border: 1px solid #313d45; border-radius: 12px; color: white; outline: none; box-sizing: border-box; }
+        #auth button { width:100%; padding:15px; background: var(--wa-teal); color:#fff; border:none; border-radius:12px; font-weight: bold; cursor: pointer; }
+
+        #app { display:none; flex-direction:column; height:100%; }
+        .header { background: var(--dark-sec); padding: 15px 20px; flex-shrink: 0; }
+        .tabs { display: flex; margin-top: 15px; }
+        .tab { flex: 1; padding: 12px; cursor: pointer; text-align: center; color: var(--text-sec); font-size: 14px; font-weight: bold; }
+        .tab.active { color: var(--wa-teal); border-bottom: 3px solid var(--wa-teal); }
+
+        .content-list { flex: 1; overflow-y: auto; display: none; }
+        .content-list.active { display: block; }
+        .item { padding: 15px 20px; display: flex; align-items: center; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .avatar { width: 50px; height: 50px; background: #54656f; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px; flex-shrink: 0; }
+
+        #chatView { display:none; flex-direction:column; height:100%; position: absolute; top:0; left:0; width:100%; z-index: 20; background: #0b141a; }
+        .chat-header { background: var(--dark-sec); padding: 10px 15px; display: flex; align-items: center; gap: 12px; height: 65px; flex-shrink: 0; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 14.5px; position: relative; word-wrap: break-word; }
+        .me { background: #005c4b; align-self: flex-end; border-top-right-radius: 2px; }
+        .other { background: #202c33; align-self: flex-start; border-top-left-radius: 2px; }
+        .msg-meta { font-size: 10px; color: rgba(255,255,255,0.5); text-align: right; margin-top: 4px; }
+
+        .input-area { background: var(--dark-sec); padding: 10px 15px; display: flex; gap: 8px; align-items: center; flex-shrink: 0; position: relative; }
+        .input-area input { flex: 1; border-radius: 20px; border: none; padding: 12px 15px; outline: none; background: #2a3942; color: white; }
+        .btn-send { background: var(--wa-teal); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; }
+        .btn-icon { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-sec); display: flex; align-items: center; justify-content: center; }
+        
+        emoji-picker { 
+            position: absolute; bottom: 70px; left: 10px; right: 10px; 
+            height: 350px; z-index: 100; display: none;
+            --background: #202c33; --border-color: #313d45;
+        }
+
+        .sticker-img { width: 140px; height: 140px; object-fit: contain; display: block; }
+        .unread-badge { background: var(--wa-light-green); color: #000; font-size: 11px; font-weight: bold; padding: 2px 7px; border-radius: 12px; margin-left: auto; }
+
+        #callOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: #111b21; z-index:100; color:white; flex-direction:column; align-items:center; justify-content:center; }
+    </style>
+</head>
+<body>
+
+<audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" preload="auto"></audio>
+<audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
+
+<div class="container">
+    <div id="auth">
+        <div class="maple-logo">🍁</div>
+        <h2 style="font-weight: 300;">Delivey Drogas</h2>
+        <input id="email" type="email" placeholder="E-mail">
+        <input id="password" type="password" placeholder="Senha">
+        <button onclick="authUser()">ACESSAR</button>
+    </div>
+
+    <div id="app">
+        <div class="header">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>Mensagens 🍁</b>
+                <span onclick="logout()" style="cursor:pointer; font-size:11px; opacity:0.6;">SAIR</span>
+            </div>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('chats', this)">CONVERSAS</div>
+                <div class="tab" onclick="switchTab('contacts', this); loadContacts();">CONTATOS</div>
+            </div>
+        </div>
+        <div id="list-chats" class="content-list active"></div>
+        <div id="list-contacts" class="content-list"></div>
+    </div>
+
+    <div id="chatView">
+        <div class="chat-header">
+            <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:24px;">←</button>
+            <div class="avatar" id="chatAvatar" style="width:38px; height:38px;"></div>
+            <div style="flex:1;">
+                <b id="currentChatName"></b><br>
+                <small id="userPresence" style="font-size:11px;"></small>
+            </div>
+            <button onclick="startCall()" style="background:none; border:none; color:white; font-size:20px;">📞</button>
+        </div>
+        
+        <emoji-picker id="picker"></emoji-picker>
+
+        <div class="chat-box" id="chatBox"></div>
+        
+        <div class="input-area">
+            <button class="btn-icon" onclick="toggleEmoji()">😊</button>
+            <input id="msgInput" type="text" placeholder="Mensagem..." autocomplete="off">
+            <button class="btn-icon" onclick="sendSticker('https://cdn-icons-png.flaticon.com/512/4721/4721215.png')">🖼️</button>
+            <button class="btn-send" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+</div>
+
+<div id="callOverlay">
+    <div class="avatar" id="callAvatar" style="width:110px; height:110px; font-size:40px; margin-bottom:20px;">?</div>
+    <h2 id="callUserName">Usuário</h2>
+    <p id="callStatus" style="color: var(--wa-light-green);">Chamando...</p>
+    <div style="display:flex; gap: 20px;">
+        <button id="btnAnswer" style="background:var(--wa-light-green); border:none; width:65px; height:65px; border-radius:50%; display:none;">📞</button>
+        <button id="btnHangup" style="background:var(--canada-red); border:none; width:65px; height:65px; border-radius:50%;">🚫</button>
+    </div>
+</div>
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, updateDoc, where, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyA6gWb20jFrAYitLtujncJDOG8wwRCY0RU", authDomain: "newchat-6c933.firebaseapp.com", projectId: "newchat-6c933" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null, activeChatId = null, currentOtherEmail = null;
+    let unsubMessages = null, usersMap = {}, chatsData = new Map(), firstLoad = true;
+
+    window.toggleEmoji = () => {
+        const p = document.getElementById("picker");
+        p.style.display = p.style.display === "block" ? "none" : "block";
+    };
+
+    document.getElementById('picker').addEventListener('emoji-click', event => {
+        document.getElementById('msgInput').value += event.detail.unicode;
+    });
+
+    async function reqPerm() { if("Notification" in window) await Notification.requestPermission(); }
+
+    onAuthStateChanged(auth, async user => {
+        if(user) { 
+            currentUser = user; 
+            document.getElementById("auth").style.display = "none"; 
+            document.getElementById("app").style.display = "flex"; 
+            await updateDoc(doc(db, "users", currentUser.uid), {online: true, typing: ""});
+            reqPerm(); listenAllUsers(); startGlobalMessageListener(); listenForCalls();
+        } else { 
+            document.getElementById("auth").style.display = "flex"; 
+            document.getElementById("app").style.display = "none"; 
+        }
+    });
+
+    function startGlobalMessageListener() {
+        onSnapshot(query(collection(db, "messages")), snap => {
+            chatsData = new Map();
+            snap.forEach(d => {
+                const data = d.data();
+                if(data.chat?.includes(currentUser.email)) {
+                    const other = data.chat.split("_").find(p => p !== currentUser.email);
+                    const displayText = data.type === 'sticker' ? '🖼️ Figurinha' : data.text;
+                    
+                    if(!chatsData.has(other) || data.time > chatsData.get(other).time) {
+                        chatsData.set(other, { last: displayText, time: data.time, unread: 0 });
+                    }
+                    
+                    // Incrementa não lidas se a mensagem não for minha e status não for read
+                    if(data.user !== currentUser.email && data.status !== "read") {
+                        let info = chatsData.get(other);
+                        info.unread++;
+                        chatsData.set(other, info);
+                    }
+                }
+            });
+
+            snap.docChanges().forEach(change => {
+                if (change.type === "added" && !firstLoad) {
+                    const data = change.doc.data();
+                    if (data.chat?.includes(currentUser.email) && data.user !== currentUser.email) {
+                        if (activeChatId !== data.chat) {
+                            const sound = document.getElementById("notifSound");
+                            sound.currentTime = 0; 
+                            sound.play().catch(()=>{});
+                        }
+                    }
+                }
+            });
+            firstLoad = false; 
+            renderChatList();
+        });
+    }
+
+    function renderChatList() {
+        const list = document.getElementById("list-chats");
+        if(!list) return; list.innerHTML = "";
+        Array.from(chatsData.entries()).sort((a,b) => b[1].time - a[1].time).forEach(([email, info]) => {
+            const item = document.createElement("div");
+            item.className = "item";
+            item.innerHTML = `
+                <div class="avatar">${email[0].toUpperCase()}</div>
+                <div style="flex:1">
+                    <b>${email.split('@')[0]}</b><br>
+                    <small>${info.last}</small>
+                </div>
+                ${info.unread > 0 ? `<div class="unread-badge">${info.unread}</div>` : ''}`;
+            item.onclick = () => openChat(email);
+            list.appendChild(item);
+        });
+    }
+
+    window.openChat = async (other) => {
+        currentOtherEmail = other;
+        activeChatId = [currentUser.email, other].sort().join("_");
+        document.getElementById("chatView").style.display = "flex";
+        document.getElementById("currentChatName").innerText = other.split('@')[0];
+        document.getElementById("chatAvatar").innerText = other[0].toUpperCase();
+        
+        // Sincroniza status de leitura no Firebase para todos
+        const q = query(collection(db, "messages"), where("chat", "==", activeChatId), where("status", "==", "sent"), where("user", "==", other));
+        const snap = await getDocs(q);
+        const batch = writeBatch(db);
+        snap.forEach(d => batch.update(d.ref, {status: "read"}));
+        await batch.commit();
+        
+        listenMessages(); listenPresence(other);
+    };
+
+    function listenMessages() {
+        if(unsubMessages) unsubMessages();
+        unsubMessages = onSnapshot(query(collection(db, "messages"), where("chat", "==", activeChatId)), snap => {
+            const box = document.getElementById("chatBox");
+            let msgs = [];
+            snap.forEach(d => msgs.push(d.data()));
+            msgs.sort((a,b) => a.time - b.time);
+            box.innerHTML = ""; 
+            msgs.forEach(m => {
+                const div = document.createElement("div");
+                div.className = `msg ${m.user === currentUser.email ? 'me' : 'other'}`;
+                const content = m.type === 'sticker' ? `<img src="${m.text}" class="sticker-img">` : m.text;
+                div.innerHTML = `${content} <div class="msg-meta">${new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    window.sendMessage = async () => {
+        const input = document.getElementById("msgInput");
+        if(!input.value.trim()) return;
+        const txt = input.value;
+        input.value = "";
+        document.getElementById("picker").style.display = "none";
+        await addDoc(collection(db, "messages"), { chat: activeChatId, user: currentUser.email, text: txt, time: Date.now(), status: "sent", type: "text" });
+    };
+
+    window.sendSticker = async (url) => {
+        await addDoc(collection(db, "messages"), { chat: activeChatId, user: currentUser.email, text: url, time: Date.now(), status: "sent", type: "sticker" });
+    };
+
+    window.logout = async () => { 
+        await updateDoc(doc(db, "users", currentUser.uid), {online: false}); 
+        signOut(auth); 
+        location.reload(); 
+    };
+
+    window.closeChat = () => { document.getElementById("chatView").style.display = "none"; activeChatId = null; };
+    window.switchTab = (t, e) => { 
+        document.querySelectorAll('.tab, .content-list').forEach(x => x.classList.remove('active')); 
+        e.classList.add('active'); document.getElementById('list-'+t).classList.add('active'); 
+    };
+
+    function listenAllUsers() {
+        onSnapshot(collection(db, "users"), snap => {
+            snap.forEach(d => { usersMap[d.data().email] = d.data(); });
+        });
+    }
+
+    function listenPresence(e) {
+        onSnapshot(query(collection(db, "users"), where("email", "==", e)), snap => {
+            snap.forEach(d => {
+                const el = document.getElementById("userPresence");
+                el.innerText = d.data().online ? "online" : "offline";
+            });
+        });
+    }
+
+    window.authUser = async () => {
+        const e = document.getElementById("email").value, p = document.getElementById("password").value;
+        try { await signInWithEmailAndPassword(auth, e, p); } catch {
+            const u = await createUserWithEmailAndPassword(auth, e, p);
+            await setDoc(doc(db, "users", u.user.uid), { email: e, online: true, typing: "" });
+        }
+    };
+
+    window.loadContacts = () => { 
+        onSnapshot(collection(db, "users"), s => { 
+            const l = document.getElementById("list-contacts"); l.innerHTML = ""; 
+            s.forEach(d => { if(d.data().email !== currentUser.email) {
+                const i = document.createElement("div"); i.className = "item";
+                i.innerHTML = `<div class="avatar">${d.data().email[0].toUpperCase()}</div><div><b>${d.data().email.split('@')[0]}</b></div>`;
+                i.onclick = () => openChat(d.data().email); l.appendChild(i);
+            }});
+        });
+    };
+    document.getElementById("msgInput").onkeydown = (e) => { if(e.key === "Enter") sendMessage(); };
+</script>
+</body>
+</html>
