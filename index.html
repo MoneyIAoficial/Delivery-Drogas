@@ -3,36 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Disk Drogas - CDL</title>
+    <title>Delivery Drogas - Mobile</title>
     <style>
-        :root { --wa-teal: #075e54; --wa-light-green: #25d366; --wa-bg: #e5ddd5; --wa-me: #dcf8c6; --wa-other: #ffffff; --wa-red: #e53935; }
-        body { margin:0; font-family: 'Segoe UI', sans-serif; background:#111; display:flex; justify-content:center; height: 100vh; overflow: hidden; }
-        .container { width:100%; max-width:450px; height:100%; background:#fff; display:flex; flex-direction:column; position: relative; }
-        
+        :root { 
+            --wa-teal: #075e54; 
+            --wa-light-green: #25d366; 
+            --wa-bg: #e5ddd5; 
+            --wa-me: #dcf8c6; 
+            --wa-other: #ffffff; 
+            --wa-red: #e53935; 
+        }
+
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #111; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        .container { width: 100%; max-width: 450px; height: 100%; background: #fff; display: flex; flex-direction: column; position: relative; }
+
+        /* Scroll invisível para Mobile */
+        #chatBox::-webkit-scrollbar { display: none; }
+        #chatBox { 
+            -ms-overflow-style: none; scrollbar-width: none; 
+            flex: 1; padding: 15px; overflow-y: auto; display: flex; 
+            flex-direction: column; gap: 8px; background: var(--wa-bg); 
+            scroll-behavior: smooth;
+        }
+
         /* UI de Chamada */
-        #callUI { display:none; position: absolute; top: 0; width: 100%; background: #075e54; color: white; padding: 20px; z-index: 2000; text-align: center; box-sizing: border-box; }
+        #callUI { display: none; position: absolute; top: 0; width: 100%; background: #075e54; color: white; padding: 20px; z-index: 2000; text-align: center; box-sizing: border-box; }
         .call-btns { display: flex; justify-content: space-around; margin-top: 20px; }
-        .btn-call { border: none; padding: 15px; border-radius: 50%; cursor: pointer; font-size: 20px; width: 60px; height: 60px; }
+        .btn-call { border: none; padding: 15px; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; font-size: 20px; }
         .accept { background: var(--wa-light-green); color: white; }
         .decline { background: var(--wa-red); color: white; }
 
-        /* Resto do Layout */
-        #app { display:none; flex-direction:column; height:100%; background: var(--wa-bg); }
+        #app { display: none; flex-direction: column; height: 100%; }
         .header { background: var(--wa-teal); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        #chatBox { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 8px 12px; border-radius: 8px; max-width: 80%; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+
+        /* Mensagens */
+        .msg { padding: 8px 12px; border-radius: 8px; max-width: 85%; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; line-height: 1.4; }
         .me { background: var(--wa-me); align-self: flex-end; }
         .other { background: var(--wa-other); align-self: flex-start; }
-        .msg-user { font-weight: bold; font-size: 11px; color: #075e54; display: block; }
         
-        .input-area { background: #f0f0f0; padding: 10px; display: flex; gap: 5px; align-items: center; }
-        #emojiPicker { display:none; position:absolute; bottom:60px; background:white; padding:10px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:100; grid-template-columns: repeat(5, 1fr); }
-        .input-area input { flex: 1; border-radius: 25px; border: none; padding: 12px; outline: none; }
-        .btn-send { background: var(--wa-teal); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; }
-        
-        #auth { margin: auto; width: 80%; text-align: center; }
-        #auth input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
-        #auth button { width: 100%; padding: 10px; background: var(--wa-light-green); border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .msg-user { font-weight: bold; font-size: 11px; color: #075e54; display: block; margin-bottom: 2px; }
+        .msg-time { font-size: 10px; color: #666; float: right; margin-top: 4px; margin-left: 8px; }
+        .del-btn { color: var(--wa-red); font-size: 12px; cursor: pointer; margin-left: 8px; float: right; opacity: 0.5; }
+
+        /* Entrada de texto */
+        .input-area { background: #f0f0f0; padding: 10px; display: flex; gap: 8px; align-items: center; }
+        #emojiPicker { display: none; position: absolute; bottom: 65px; background: white; padding: 10px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 100; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .input-area input { flex: 1; border-radius: 25px; border: none; padding: 12px 15px; outline: none; font-size: 16px; }
+        .btn-send { background: var(--wa-teal); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+
+        /* Login/Cadastro */
+        #auth { margin: auto; width: 85%; text-align: center; }
+        #auth input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
+        .auth-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .btn-auth { width: 100%; padding: 13px; border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 15px; }
+        .login { background: var(--wa-light-green); }
+        .register { background: var(--wa-teal); }
     </style>
 </head>
 <body>
@@ -42,8 +67,8 @@
 
 <div class="container">
     <div id="callUI">
-        <h3 id="callTitle">Chamada Global</h3>
-        <p id="callStatus">Ouvindo...</p>
+        <h3 id="callTitle">Chamada de Voz</h3>
+        <p id="callStatus">Conectando...</p>
         <div class="call-btns">
             <button class="btn-call accept" onclick="joinVoice()">📞</button>
             <button class="btn-call decline" onclick="leaveVoice()">🚫</button>
@@ -51,25 +76,28 @@
     </div>
 
     <div id="auth">
-        <h2>WhatsApp Pro</h2>
+        <h2>Delivery Drogas</h2>
         <input id="email" type="email" placeholder="E-mail">
-        <input id="password" type="password" placeholder="Senha">
-        <button onclick="authUser()">ENTRAR</button>
+        <input id="password" type="password" placeholder="Senha (mín. 6 dígitos)">
+        <div class="auth-actions">
+            <button class="btn-auth login" onclick="authUser()">ENTRAR</button>
+            <button class="btn-auth register" onclick="createAccount()">CRIAR CONTA</button>
+        </div>
     </div>
 
     <div id="app">
         <div class="header">
-            <b>Grupo Da Droga</b>
+            <b>Grupo Cdl</b>
             <div style="display:flex; gap:15px; align-items:center;">
                 <span onclick="startCall()" style="cursor:pointer; font-size:22px;">📞</span>
-                <button onclick="logout()" style="background:none; border:1px solid white; color:white; padding:3px 8px; border-radius:5px;">SAIR</button>
+                <button onclick="logout()" style="background:none; border:1px solid white; color:white; padding:4px 10px; border-radius:5px; font-size:12px;">SAIR</button>
             </div>
         </div>
         <div id="chatBox"></div>
         <div class="input-area">
             <div id="emojiPicker"></div>
-            <button onclick="toggleEmoji()" style="background:none; border:none; font-size:20px;">😊</button>
-            <input id="msgInput" type="text" placeholder="Mensagem...">
+            <button onclick="toggleEmoji()" style="background:none; border:none; font-size:22px; cursor:pointer;">😊</button>
+            <input id="msgInput" type="text" placeholder="Mensagem..." autocomplete="off">
             <button class="btn-send" onclick="sendMsg()">➤</button>
         </div>
     </div>
@@ -77,24 +105,37 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyA6gWb20jFrAYitLtujncJDOG8wwRCY0RU", authDomain: "newchat-6c933.firebaseapp.com", projectId: "newchat-6c933" };
+    const firebaseConfig = { 
+        apiKey: "AIzaSyA6gWb20jFrAYitLtujncJDOG8wwRCY0RU", 
+        authDomain: "newchat-6c933.firebaseapp.com", 
+        projectId: "newchat-6c933" 
+    };
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     let currentUser = null;
     let localStream = null;
-    let peerConnections = {}; 
-    const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
-    // --- LOGIN ---
+    // Formatar Hora
+    const formatTime = (ts) => ts ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
+
+    // Autenticação
     window.authUser = async () => {
         const e = document.getElementById("email").value, p = document.getElementById("password").value;
-        try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Erro ao entrar."); }
+        try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Erro no login!"); }
     };
+
+    window.createAccount = async () => {
+        const e = document.getElementById("email").value, p = document.getElementById("password").value;
+        if(p.length < 6) return alert("Senha curta demais!");
+        try { await createUserWithEmailAndPassword(auth, e, p); alert("Conta Criada!"); } catch (err) { alert(err.message); }
+    };
+
     window.logout = () => signOut(auth);
 
     onAuthStateChanged(auth, user => {
@@ -109,106 +150,97 @@
         }
     });
 
-    // --- EMOJIS ---
-    window.toggleEmoji = () => {
-        const p = document.getElementById("emojiPicker");
-        p.style.display = p.style.display === "grid" ? "none" : "grid";
-        if(p.innerHTML === "") {
-            ['😊','😂','😍','🔥','👍','🙌','😢','❤️'].forEach(e => {
-                let s = document.createElement("span"); s.innerText = e; s.style.cursor="pointer";
-                s.onclick = () => { document.getElementById("msgInput").value += e; p.style.display="none"; };
-                p.appendChild(s);
-            });
-        }
-    };
-
-    // --- CHAT ---
+    // Chat Principal
     function initApp() {
+        // ORDEM CRONOLÓGICA (ASCENDE)
         const q = query(collection(db, "global_messages"), orderBy("time", "asc"));
+        
         onSnapshot(q, snap => {
             const box = document.getElementById("chatBox");
-            snap.docChanges().forEach(change => {
-                if (change.type === "added") {
-                    const data = change.doc.data();
-                    if(data.user !== currentUser.email) document.getElementById("msgSound").play();
-                    const div = document.createElement("div");
-                    div.className = `msg ${data.user === currentUser.email ? 'me' : 'other'}`;
-                    div.innerHTML = `<span class="msg-user">${data.user.split('@')[0]}</span>${data.text}`;
-                    box.appendChild(div);
-                    box.scrollTop = box.scrollHeight;
-                }
+            box.innerHTML = ""; 
+            
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                const isMe = data.user === currentUser.email;
+
+                const div = document.createElement("div");
+                div.className = `msg ${isMe ? 'me' : 'other'}`;
+                
+                let del = isMe ? `<span class="del-btn" onclick="deleteMsg('${id}')">🗑️</span>` : '';
+                
+                div.innerHTML = `
+                    <span class="msg-user">${data.user.split('@')[0]}</span>
+                    <span>${data.text}</span>
+                    <span class="msg-time">${formatTime(data.time)}</span>
+                    ${del}
+                `;
+                box.appendChild(div);
             });
+            box.scrollTop = box.scrollHeight; // Sempre desce para a última
         });
 
-        // Ouvinte de Chamada
+        // Chamada de Voz
         onSnapshot(doc(db, "global_call", "current"), s => {
-            const data = s.data();
+            const d = s.data();
             const ui = document.getElementById("callUI");
             const ring = document.getElementById("ringSound");
-
-            if(data && data.active) {
+            if(d && d.active) {
                 ui.style.display = "block";
-                document.getElementById("callTitle").innerText = `Chamada de ${data.caller.split('@')[0]}`;
-                if(data.caller !== currentUser.email) ring.play();
+                document.getElementById("callTitle").innerText = `Ligação de ${d.caller.split('@')[0]}`;
+                if(d.caller !== currentUser.email) ring.play();
             } else {
-                ui.style.display = "none";
-                ring.pause();
-                ring.currentTime = 0;
-                stopVoice();
+                ui.style.display = "none"; ring.pause(); stopVoice();
             }
         });
     }
 
     window.sendMsg = async () => {
         const input = document.getElementById("msgInput");
-        if(!input.value) return;
-        await addDoc(collection(db, "global_messages"), { user: currentUser.email, text: input.value, time: Date.now() });
-        input.value = "";
+        const val = input.value.trim();
+        if(!val) return;
+        input.value = ""; 
+        await addDoc(collection(db, "global_messages"), { 
+            user: currentUser.email, 
+            text: val, 
+            time: Date.now() 
+        });
     };
 
-    // --- VOZ REAL (WEBRTC) ---
+    window.deleteMsg = async (id) => {
+        if(confirm("Apagar?")) await deleteDoc(doc(db, "global_messages", id));
+    };
+
+    window.toggleEmoji = () => {
+        const p = document.getElementById("emojiPicker");
+        p.style.display = p.style.display === "grid" ? "none" : "grid";
+        if(p.innerHTML === "") {
+            ['😊','😂','🔥','👍','❤️','😢','🙌','✅','🚀','😲'].forEach(e => {
+                let s = document.createElement("span"); 
+                s.innerText = e; s.style.cursor="pointer"; s.style.fontSize="24px";
+                s.onclick = () => { document.getElementById("msgInput").value += e; p.style.display="none"; };
+                p.appendChild(s);
+            });
+        }
+    };
+
+    // Funções de Chamada (Simplificadas)
     window.startCall = async () => {
         await setDoc(doc(db, "global_call", "current"), { active: true, caller: currentUser.email, time: Date.now() });
     };
-
     window.joinVoice = async () => {
         document.getElementById("ringSound").pause();
-        document.getElementById("callStatus").innerText = "Conectando áudio...";
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            // Aqui o áudio está ativo localmente. 
-            // Em um sistema real, aqui dispararíamos os WebRTC Offers/Answers.
-            // Para este protótipo, simulamos a conexão de sucesso:
-            document.getElementById("callStatus").innerText = "Em conferência (Microfone Ativo)";
-            document.querySelector(".accept").style.display = "none";
-        } catch (e) {
-            alert("Erro ao acessar microfone: " + e.message);
-        }
+        document.getElementById("callStatus").innerText = "Em Chamada...";
+        try { localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { alert("Microfone off"); }
     };
-
     window.leaveVoice = async () => {
-        // Se for o autor, desliga para todos. Se não, só sai da tela.
-        const s = await (await doc(db, "global_call", "current"));
-        onSnapshot(doc(db, "global_call", "current"), async snap => {
-            if(snap.data()?.caller === currentUser.email) {
-                await updateDoc(doc(db, "global_call", "current"), { active: false });
-            }
-        });
+        await updateDoc(doc(db, "global_call", "current"), { active: false });
         stopVoice();
-        document.getElementById("callUI").style.display = "none";
-        document.querySelector(".accept").style.display = "inline-block";
     };
-
     function stopVoice() {
-        if(localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        document.getElementById("callStatus").innerText = "Ouvindo...";
+        if(localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+        document.getElementById("callStatus").innerText = "Conectando...";
     }
-
-    window.endGlobalCall = window.leaveVoice;
-
 </script>
 </body>
 </html>
